@@ -68,7 +68,7 @@
     "/auth/reissue": {
       "post": {
         "summary": "액세스 토큰 재발급",
-        "description": "리프레시 토큰을 이용해 새로운 Access Token을 발급합니다.",
+        "description": "리프레시 토큰을 이용해 새로운 Access Token과 Refresh Token을 재발급합니다.기존 Refresh Token은 폐기됩니다. (Refresh Token Rotation)" ,
         "requestBody": {
           "content": {
             "application/json": {
@@ -88,7 +88,8 @@
                   "$ref": "#/components/schemas/inline_response_200"
                 },
                 "example": {
-                  "jwtToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.newtoken123"
+                  "jwtToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.newtoken123",
+                  "refreshToken": "rft_new_987654321"
                 }
               }
             }
@@ -154,7 +155,6 @@
                   "$ref": "#/components/schemas/UserInfoResponse"
                 },
                 "example": {
-                  "id": 1,
                   "name": "영주",
                   "email": "youngju@example.com",
                   "phone": "010-1234-5678",
@@ -162,9 +162,7 @@
                     "zipcode": "12345",
                     "road": "서울특별시 강남구 123",
                     "detail": "101동 1001호"
-                  },
-                  "createdAt": "2025-11-27T16:00:00Z",
-                  "updatedAt": "2025-11-27T16:05:00Z"
+                  }
                 }
               }
             }
@@ -216,17 +214,25 @@
                   "$ref": "#/components/schemas/UserInfoResponse"
                 },
                 "example": {
-                  "id": 1,
                   "name": "홍길동",
                   "email": "youngju@example.com",
                   "phone": "010-1234-5678",
-                  "address": {
+                  "address": [
+                  {
+                    "addressId": 1,
                     "zipcode": "12345",
-                    "road": "서울특별시 강남구 테헤란로 123",
-                    "detail": "101동 1001호"
+                    "road": "서울 ...",
+                    "detail": "...",
+                    "isDefault": true
                   },
-                  "createdAt": "2025-11-27T16:00:00Z",
-                  "updatedAt": "2025-12-04T12:00:00Z"
+                  {
+                    "addressId": 2,
+                    "zipcode": "54321",
+                    "road": "부산 ...",
+                    "detail": "...",
+                    "isDefault": false
+                  }
+                ]
                 }
               }
             }
@@ -473,7 +479,7 @@
         }
       }
     },
-    "/users/me/cart": {
+    "/cart": {
   "get": {
     "summary": "내 장바구니 조회",
     "security": [{ "bearerAuth": [] }],
@@ -490,35 +496,49 @@
   }
 },
 
-"/users/me/cart/items": {
-  "post": {
-    "summary": "장바구니 상품 추가",
-    "security": [{ "bearerAuth": [] }],
-    "requestBody": {
-      "required": true,
-      "content": {
-        "application/json": {
-          "schema": { "$ref": "#/components/schemas/AddCartItemRequest" }
-        }
-      }
-    },
-    "responses": {
-      "201": {
-        "description": "상품 추가 성공"
-      },
-      "400": {
-        "description": "재고 부족",
-        "content": {
-          "application/json": {
-            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+      "/cart/items": {
+        "post": {
+          "summary": "장바구니 상품 추가",
+          "security": [{ "bearerAuth": [] }],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AddCartItemRequest" }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "상품 추가 성공"
+            },
+            "400": {
+              "description": "재고 부족",
+              "content": {
+                "application/json": {
+                  "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                }
+              }
+            },
+            "409": {
+              "description": "장바구니 최대 개수 초과",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ErrorResponse"
+                  },
+                  "example": {
+                    "code": "CART_LIMIT_EXCEEDED",
+                    "message": "장바구니에는 최대 100개까지만 담을 수 있습니다"
+                  }
+                }
+              }
+            }
           }
         }
-      }
-    }
-  }
-},
+      },
 
-      "/users/me/cart/items/{cartItemId}": {
+      "/cart/items/{cartItemId}": {
         "patch": {
           "summary": "장바구니 상품 수량 변경",
           "security": [{ "bearerAuth": [] }],
@@ -591,10 +611,8 @@
               }
             }
           }
-        }
-      },
+        },
 
-      "/users/me/orders": {
         "get": {
           "summary": "내 주문 목록 조회",
           "security": [{ "bearerAuth": [] }],
@@ -615,7 +633,7 @@
         }
       },
 
-      "/users/me/orders/{orderId}": {
+      "/orders/{orderId}": {
         "get": {
           "summary": "주문 상세 조회",
           "security": [{ "bearerAuth": [] }],
@@ -648,82 +666,7 @@
         }
       },
 
-      "/orders/{orderId}/payments/success": {
-        "post": {
-          "summary": "Mock 결제 성공 처리",
-          "description": "결제 성공을 시뮬레이션합니다. 주문 상태를 PAID로 변경하고 재고를 차감합니다.",
-          "security": [{ "bearerAuth": [] }],
-          "parameters": [
-            {
-              "name": "orderId",
-              "in": "path",
-              "required": true,
-              "schema": { "type": "integer" }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "결제 성공",
-              "content": {
-                "application/json": {
-                  "schema": { "$ref": "#/components/schemas/PaymentSuccessResponse" }
-                }
-              }
-            },
-            "400": {
-              "description": "이미 처리된 주문 또는 재고 부족",
-              "content": {
-                "application/json": {
-                  "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-                }
-              }
-            },
-            "403": {
-              "description": "타인의 주문 결제 시도",
-              "content": {
-                "application/json": {
-                  "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-                }
-              }
-            }
-          }
-        }
-      },
-      "/orders/{orderId}/payments/fail": {
-        "post": {
-          "summary": "Mock 결제 실패 처리",
-          "description": "결제 실패를 시뮬레이션합니다. 주문 상태를 CANCELLED로 변경하고 재고를 복구합니다.",
-          "security": [{ "bearerAuth": [] }],
-          "parameters": [
-            {
-              "name": "orderId",
-              "in": "path",
-              "required": true,
-              "schema": { "type": "integer" }
-            }
-          ],
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/PaymentFailRequest" }
-              }
-            }
-          },
-          "responses": {
-            "200": {
-              "description": "결제 실패 처리 완료",
-              "content": {
-                "application/json": {
-                  "schema": { "$ref": "#/components/schemas/PaymentFailResponse" }
-                }
-              }
-            }
-          }
-        }
-      },
-
-      "/users/me/payments": {
+      "/payments": {
         "get": {
           "summary": "내 결제 내역 조회",
           "security": [{ "bearerAuth": [] }],
@@ -816,17 +759,18 @@
           }
         }
       },
-      "ErrorResponse": {
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "integer"
-          },
-          "message": {
-            "type": "string"
+       "ErrorResponse": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string",
+              "example": "CART_LIMIT_EXCEEDED"
+            },
+            "message": {
+              "type": "string"
+            }
           }
-        }
-      },
+        },
       "UserInfoResponse": {
         "type": "object",
         "properties": {
@@ -1018,18 +962,40 @@
 
       "CreateOrderRequest": {
         "type": "object",
-        "required": ["orderType", "items", "addressId"],
+        "required": ["orderType", "addressId"],
         "properties": {
           "orderType": {
             "type": "string",
             "enum": ["CART", "DIRECT"]
           },
+
+          "cartItems": {
+            "type": "array",
+            "description": "orderType이 CART인 경우 사용",
+            "items": {
+              "type": "object",
+              "required": ["cartItemId"],
+              "properties": {
+                "cartItemId": {
+                  "type": "integer"
+                },
+                "quantity": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "description": "미전달 시 장바구니 수량 사용"
+                }
+              }
+            }
+          },
+
           "items": {
             "type": "array",
+            "description": "orderType이 DIRECT인 경우 사용",
             "items": {
               "$ref": "#/components/schemas/OrderItemRequest"
             }
           },
+
           "addressId": {
             "type": "integer"
           }
@@ -1156,54 +1122,6 @@
         }
       },
 
-      "PaymentSuccessResponse": {
-        "type": "object",
-        "properties": {
-          "paymentId": { "type": "integer" },
-          "orderId": { "type": "integer" },
-          "paymentStatus": {
-            "type": "string",
-            "enum": ["SUCCESS"]
-          },
-          "paidAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "redirectUrl": {
-            "type": "string",
-            "example": "/payments/success"
-          }
-        }
-      },
-
-      "PaymentFailRequest": {
-        "type": "object",
-        "required": ["reason"],
-        "properties": {
-          "reason": {
-            "type": "string",
-            "example": "카드 잔액 부족"
-          }
-        }
-      },
-
-      "PaymentFailResponse": {
-        "type": "object",
-        "properties": {
-          "paymentStatus": {
-            "type": "string",
-            "enum": ["FAILED"]
-          },
-          "reason": {
-            "type": "string"
-          },
-          "redirectUrl": {
-            "type": "string",
-            "example": "/orders"
-          }
-        }
-      },
-
       "PaymentListResponse": {
         "type": "object",
         "properties": {
@@ -1246,6 +1164,9 @@
         "type": "object",
         "properties": {
           "jwtToken": {
+            "type": "string"
+          },
+         "refreshToken": {
             "type": "string"
           }
         }
