@@ -1,0 +1,5 @@
+rootProject.name = 'shop'
+
+include("api", "core")
+
+includeBuild("build-logic")

@@ -1,0 +1,16 @@
+package com.moon.shop.user.dto;
+
+import lombok.Builder;
+import lombok.Getter;
+
+@Builder
+@Getter
+public class UserDTO {
+
+    private Long userId;
+    private String email;
+    private String name;
+    private String phone;
+
+    private AddressDTO address;
+}
