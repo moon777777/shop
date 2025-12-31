@@ -1,6 +1,5 @@
 package com.moon.shop.user.dto;
 
-import com.moon.shop.user.dto.address.AddressDTO;
 import lombok.Builder;
 import lombok.Getter;
 
