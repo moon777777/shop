@@ -198,6 +198,7 @@
                 "$ref": "#/components/schemas/UserUpdateRequest"
               },
               "example": {
+                "emaill": "123@gmail.com",
                 "name": "홍길동",
                 "phone": "010-1234-5678"
               }
@@ -801,6 +802,7 @@
       },
       "UserUpdateRequest": {
         "required": [
+          "email",
           "name",
           "phone"
         ],
