@@ -1,0 +1,27 @@
+plugins {
+    id 'java-gradle-plugin'
+}
+
+group = 'com.moon'
+version = '1.0.0'
+
+gradlePlugin {
+    plugins {
+        create("myPlugin") {
+            id = "com.moon.myPlugin"
+            implementationClass = "com.moon.MyPlugin"
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+
