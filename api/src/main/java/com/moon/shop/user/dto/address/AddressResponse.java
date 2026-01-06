@@ -3,7 +3,7 @@ package com.moon.shop.user.dto.address;
 import lombok.Getter;
 
 @Getter
-public class AddressResponseDTO {
+public class AddressResponse {
 
     private final Long addressId;
     private final String name;
@@ -11,7 +11,7 @@ public class AddressResponseDTO {
     private final String road;
     private final String detail;
 
-    public AddressResponseDTO(Long addressId, String name, String zipcode, String road, String detail, boolean isDefault) {
+    public AddressResponse(Long addressId, String name, String zipcode, String road, String detail, boolean isDefault) {
         this.addressId = addressId;
         this.name = name;
         this.zipcode = zipcode;

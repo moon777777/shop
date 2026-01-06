@@ -5,12 +5,11 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class AddressCreateRequestDTO {
+public class AddressUpdateRequest {
 
     private String name;
     private String zipcode;
     private String road;
     private String detail;
     private boolean isDefault;
-
 }

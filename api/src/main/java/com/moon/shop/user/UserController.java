@@ -1,10 +1,10 @@
 package com.moon.shop.user;
 
-import com.moon.shop.user.dto.address.AddressCreateRequestDTO;
-import com.moon.shop.user.dto.address.AddressResponseDTO;
-import com.moon.shop.user.dto.UserResponseDTO;
-import com.moon.shop.user.dto.UserRequestDTO;
-import com.moon.shop.user.dto.address.AddressUpdateRequestDTO;
+import com.moon.shop.user.dto.address.AddressCreateRequest;
+import com.moon.shop.user.dto.address.AddressResponse;
+import com.moon.shop.user.dto.UserResponse;
+import com.moon.shop.user.dto.UserRequest;
+import com.moon.shop.user.dto.address.AddressUpdateRequest;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -15,8 +15,8 @@ import java.util.List;
 public class UserController {
 
     @GetMapping
-    public UserResponseDTO getMe() {
-        return new UserResponseDTO(
+    public UserResponse getMe() {
+        return new UserResponse(
                 1L,
                 "1234@gmail.com",
                 "가나다",
@@ -26,9 +26,9 @@ public class UserController {
     }
 
     @PatchMapping
-    public UserResponseDTO updateMe(@RequestBody UserRequestDTO request) {
+    public UserResponse updateMe(@RequestBody UserRequest request) {
 
-        return new UserResponseDTO(
+        return new UserResponse(
                 1L,
                 "1234@gmail.com",
                 request.getName(),
@@ -39,8 +39,8 @@ public class UserController {
 
     // 배송지 등록
     @PostMapping("/address")
-    public AddressResponseDTO createAddress(@RequestBody AddressCreateRequestDTO request) {
-        return new AddressResponseDTO(
+    public AddressResponse createAddress(@RequestBody AddressCreateRequest request) {
+        return new AddressResponse(
                 1L,
                 request.getName(),
                 request.getZipcode(),
@@ -52,17 +52,17 @@ public class UserController {
 
     // 배송지조회
     @GetMapping("/addresses")
-    public List<AddressResponseDTO> getAddresses() {
+    public List<AddressResponse> getAddresses() {
         return new ArrayList<>();
     }
 
     // 배송지 수정
     @PatchMapping("/addresses/{addressId}")
-    public AddressResponseDTO updateAddress(
+    public AddressResponse updateAddress(
             @PathVariable Long addressId,
-            @RequestBody AddressUpdateRequestDTO request
+            @RequestBody AddressUpdateRequest request
     ) {
-        return new AddressResponseDTO(
+        return new AddressResponse(
                 addressId,
                 request.getName(),
                 request.getZipcode(),
@@ -73,9 +73,9 @@ public class UserController {
     }
 
     @DeleteMapping("/addresses/{addressId}")
-    public AddressResponseDTO deleteAddress(@PathVariable Long addressId) {
+    public AddressResponse deleteAddress(@PathVariable Long addressId) {
 
-        return new AddressResponseDTO(
+        return new AddressResponse(
                 addressId,
                 "집",
                 "12345",
