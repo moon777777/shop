@@ -1,8 +1,10 @@
 package com.moon.shop.user.dto.address;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
+@AllArgsConstructor
 public class AddressResponse {
 
     private final Long addressId;
@@ -10,16 +12,6 @@ public class AddressResponse {
     private final String zipcode;
     private final String road;
     private final String detail;
-
-    public AddressResponse(Long addressId, String name, String zipcode, String road, String detail, boolean isDefault) {
-        this.addressId = addressId;
-        this.name = name;
-        this.zipcode = zipcode;
-        this.road = road;
-        this.detail = detail;
-        this.isDefault = isDefault;
-    }
-
     private final boolean isDefault;
 
 }
