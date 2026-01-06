@@ -1,8 +1,10 @@
 package com.moon.shop.user;
 
-import com.moon.shop.user.dto.AddressDTO;
-import com.moon.shop.user.dto.UserDTO;
+import com.moon.shop.user.dto.address.AddressCreateRequestDTO;
+import com.moon.shop.user.dto.address.AddressResponseDTO;
+import com.moon.shop.user.dto.UserResponseDTO;
 import com.moon.shop.user.dto.UserRequestDTO;
+import com.moon.shop.user.dto.address.AddressUpdateRequestDTO;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -13,87 +15,74 @@ import java.util.List;
 public class UserController {
 
     @GetMapping
-    public UserDTO getMe() {
-        return UserDTO.builder()
-                .userId(null)
-                .email("1234@gmail.com")
-                .name("가나다")
-                .phone("010-0000-0000")
-                .build();
+    public UserResponseDTO getMe() {
+        return new UserResponseDTO(
+                1L,
+                "1234@gmail.com",
+                "가나다",
+                "010-0000-0000",
+                null
+        );
     }
 
     @PatchMapping
-    public UserDTO updateMe(@RequestBody UserRequestDTO request) {
+    public UserResponseDTO updateMe(@RequestBody UserRequestDTO request) {
 
-        return UserDTO.builder()
-                .userId(null)
-                .email(request.getEmail())
-                .name(request.getName())
-                .phone(request.getPhone())
-                .build();
+        return new UserResponseDTO(
+                1L,
+                "1234@gmail.com",
+                request.getName(),
+                request.getPhone(),
+                null
+        );
     }
-    
-    // 더미용
-    private List<AddressDTO> addressList = new ArrayList<>();
 
     // 배송지 등록
     @PostMapping("/address")
-    public AddressDTO createAddress(@RequestBody AddressDTO request) {
-        AddressDTO newAddress = AddressDTO.builder()
-                .addressId(null)
-                .name(request.getName())
-                .zipcode(request.getZipcode())
-                .road(request.getRoad())
-                .detail(request.getDetail())
-                .isDefault(request.isDefault())
-                .build();
-
-        addressList.add(newAddress);
-        return newAddress;
+    public AddressResponseDTO createAddress(@RequestBody AddressCreateRequestDTO request) {
+        return new AddressResponseDTO(
+                1L,
+                request.getName(),
+                request.getZipcode(),
+                request.getRoad(),
+                request.getDetail(),
+                request.isDefault()
+        );
     }
 
-    @GetMapping("/address")
-    public List<AddressDTO> getAddresses() {
-        return addressList;
+    // 배송지조회
+    @GetMapping("/addresses")
+    public List<AddressResponseDTO> getAddresses() {
+        return new ArrayList<>();
     }
 
-    @PatchMapping("/{addressId}")
-    public AddressDTO updateAddress(@PathVariable Long addressId,
-                                    @RequestBody AddressDTO request) {
-        AddressDTO updatedAddress = null;
-
-        for (int i = 0; i < addressList.size(); i++) {
-            AddressDTO addr = addressList.get(i);
-            if (addr.getAddressId().equals(addressId)) {
-                addr.setName(request.getName());
-                addr.setZipcode(request.getZipcode());
-                addr.setRoad(request.getRoad());
-                addr.setDetail(request.getDetail());
-                if (request.isDefault()) {
-                    for (int j = 0; j < addressList.size(); j++) {
-                        addressList.get(j).setDefault(false);
-                    }
-                    addr.setDefault(true);
-                } else {
-                    addr.setDefault(request.isDefault());
-                }
-                updatedAddress = addr;
-                break;
-            }
-        }
-
-        return updatedAddress;
+    // 배송지 수정
+    @PatchMapping("/addresses/{addressId}")
+    public AddressResponseDTO updateAddress(
+            @PathVariable Long addressId,
+            @RequestBody AddressUpdateRequestDTO request
+    ) {
+        return new AddressResponseDTO(
+                addressId,
+                request.getName(),
+                request.getZipcode(),
+                request.getRoad(),
+                request.getDetail(),
+                request.isDefault()
+        );
     }
 
-    @DeleteMapping("/{addressId}")
-    public String deleteAddress(@PathVariable Long addressId) {
-        for (int i = 0; i < addressList.size(); i++) {
-            if (addressList.get(i).getAddressId().equals(addressId)) {
-                addressList.remove(i);
-                break;
-            }
-        }
-        return "Address deleted";
+    @DeleteMapping("/addresses/{addressId}")
+    public AddressResponseDTO deleteAddress(@PathVariable Long addressId) {
+
+        return new AddressResponseDTO(
+                addressId,
+                "집",
+                "12345",
+                "서울 1번길",
+                "10-10",
+                true
+        );
     }
     
 }

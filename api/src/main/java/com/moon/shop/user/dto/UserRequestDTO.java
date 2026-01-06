@@ -7,10 +7,8 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class UserRequestDTO {
-    private String email;
+
     private String name;
     private String phone;
 }

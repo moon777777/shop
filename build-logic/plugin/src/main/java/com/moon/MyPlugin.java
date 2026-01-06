@@ -3,7 +3,7 @@ package com.moon;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
-public class myPlugin implements Plugin<Project>  {
+public class MyPlugin implements Plugin<Project>  {
 
     @Override
     public void apply(Project project) {

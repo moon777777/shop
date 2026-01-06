@@ -8,6 +8,10 @@ group = 'com.moon'
 version = '0.0.1-SNAPSHOT'
 description = 'project shop'
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-web'

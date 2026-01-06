@@ -1,15 +1,12 @@
-package com.moon.shop.user.dto;
+package com.moon.shop.user.dto.address;
 
-import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
-@Builder
 @Getter
-@Setter
-public class AddressDTO {
+@NoArgsConstructor
+public class AddressCreateRequestDTO {
 
-    private Long addressId;
     private String name;
     private String zipcode;
     private String road;
