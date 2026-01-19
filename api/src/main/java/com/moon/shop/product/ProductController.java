@@ -1,5 +1,6 @@
 package com.moon.shop.product;
 
+<<<<<<< HEAD
 import com.moon.shop.product.dto.PageResponse;
 import com.moon.shop.product.dto.ProductDetailResponse;
 import com.moon.shop.product.dto.ProductResponse;
@@ -76,4 +77,21 @@ public class ProductController {
                 LocalDateTime.now()
         );
     }
+=======
+import com.moon.shop.product.dto.ProductDTO;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/products")
+public class ProductController {
+
+//    @GetMapping
+//    public ProductDTO getProducts() {
+//
+//    }
+>>>>>>> develop
 }
