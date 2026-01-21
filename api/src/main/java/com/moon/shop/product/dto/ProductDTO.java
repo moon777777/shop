@@ -14,4 +14,5 @@ public class ProductDTO {
     private String thumbnailImage;
     private String category;
     private Integer stock;
+    // DTO말
 }
