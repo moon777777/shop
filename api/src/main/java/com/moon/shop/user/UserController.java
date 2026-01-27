@@ -1,8 +1,9 @@
 package com.moon.shop.user;
 
+import com.moon.shop.user.dto.UserUpdateResponse;
 import com.moon.shop.user.dto.address.AddressCreateRequest;
 import com.moon.shop.user.dto.address.AddressResponse;
-import com.moon.shop.user.dto.UserResponse;
+import com.moon.shop.user.dto.UserCreateResponse;
 import com.moon.shop.user.dto.UserRequest;
 import com.moon.shop.user.dto.address.AddressUpdateRequest;
 import org.springframework.web.bind.annotation.*;
@@ -15,8 +16,8 @@ import java.util.List;
 public class UserController {
 
     @GetMapping
-    public UserResponse getMe() {
-        return new UserResponse(
+    public UserCreateResponse getMe() {
+        return new UserCreateResponse(
                 1L,
                 "1234@gmail.com",
                 "가나다",
@@ -26,9 +27,9 @@ public class UserController {
     }
 
     @PatchMapping
-    public UserResponse updateMe(@RequestBody UserRequest request) {
+    public UserUpdateResponse updateMe(@RequestBody UserRequest request) {
 
-        return new UserResponse(
+        return new UserUpdateResponse(
                 1L,
                 "1234@gmail.com",
                 request.getName(),

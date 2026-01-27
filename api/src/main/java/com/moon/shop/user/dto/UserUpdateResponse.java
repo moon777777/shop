@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class UserResponse {
+public class UserUpdateResponse {
 
     private final Long userId;
     private final String email;
