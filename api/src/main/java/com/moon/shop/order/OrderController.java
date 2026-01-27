@@ -2,6 +2,8 @@ package com.moon.shop.order;
 
 import com.moon.shop.order.dto.request.OrderCreateRequest;
 import com.moon.shop.order.dto.response.*;
+import com.moon.shop.order.repository.OrderRepository;
+import com.moon.shop.order.service.OrderService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,17 +12,15 @@ import java.util.List;
 @RestController
 @RequestMapping("/orders")
 public class OrderController {
+    private final OrderService orderService;
+
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
+    }
 
     @PostMapping
-    public OrderCreateResponse createOrder(
-            @RequestBody OrderCreateRequest request
-    ) {
-        return new OrderCreateResponse(
-                1L,
-                "12345",
-                "배송중",
-                "2026-01-01"
-        );
+    public OrderCreateResponse createOrder(@RequestBody OrderCreateRequest request) {
+        return orderService.createOrder(request);
     }
 
     // 내주문 목록 조회
