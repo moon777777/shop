@@ -1,35 +1,92 @@
 package com.moon.shop.order;
 
+
+import com.moon.shop.order.dto.request.OrderCreateRequest;
+import com.moon.shop.order.dto.response.OrderCreateResponse;
+import com.moon.shop.order.dto.response.OrderDetailResponse;
+import com.moon.shop.order.dto.response.OrderListResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.web.servlet.MockMvc;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.*;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.hasSize;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
  class OrderControllerTest {
 
+    @LocalServerPort
+    int port;
+
     @Autowired
-    private MockMvc mockMvc;
+    TestRestTemplate restTemplate;
 
     @Test
-    void 내주문목록_조회_OK() throws Exception {
-        mockMvc.perform(get("/orders")
-                        .param("page", "1")
-                        .param("size", "10"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.page", is(1)))
-                .andExpect(jsonPath("$.size", is(10)))
-                .andExpect(jsonPath("$.totalElements", is(1)))
-                .andExpect(jsonPath("$.orders", hasSize(1)))
-                .andExpect(jsonPath("$.orders[0].orderId", is(1)))
-                .andExpect(jsonPath("$.orders[0].orderStatus", is("결제완료")));
+    void 주문_생성_API_테스트() {
+        String body = """
+        {
+          "orderType": "DIRECT",
+          "items": [],
+          "addressId": 1
+        }
+        """;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<String> request = new HttpEntity<>(body, headers);
+
+
+        ResponseEntity<OrderCreateResponse> response =
+                restTemplate.postForEntity(
+                        "http://localhost:" + port + "/orders",
+                        request,
+                        OrderCreateResponse.class
+                );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody().getOrderId()).isEqualTo(1L);
+        assertThat(response.getBody().getOrderNumber()).isEqualTo("12345");
     }
+
+    @Test
+    void 주문_상세_조회_API_테스트() {
+        // given
+        Long orderId = 1L;
+
+        // when
+        ResponseEntity<OrderDetailResponse> response =
+                restTemplate.getForEntity(
+                        "http://localhost:" + port + "/orders/" + orderId,
+                        OrderDetailResponse.class
+                );
+
+        // then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        OrderDetailResponse body = response.getBody();
+        assertThat(body).isNotNull();
+
+        assertThat(body.getOrderId()).isEqualTo(orderId);
+        assertThat(body.getOrderStatus()).isEqualTo("결제완료");
+        assertThat(body.getTotalProductPrice()).isEqualTo(40000);
+        assertThat(body.getFinalPaymentPrice()).isEqualTo(22000);
+
+    }
+
+    @Test
+    void 내_주문_목록_조회_API_테스트() {
+        ResponseEntity<OrderListResponse> response =
+                restTemplate.getForEntity(
+                        "http://localhost:" + port + "/orders?page=1&size=10",
+                        OrderListResponse.class
+                );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody().getPage()).isEqualTo(1);
+        assertThat(response.getBody().getOrders().size()).isEqualTo(1);
+    }
+
 }
