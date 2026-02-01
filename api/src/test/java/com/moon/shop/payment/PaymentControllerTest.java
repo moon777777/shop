@@ -48,17 +48,17 @@ class PaymentControllerTest {
 
     @Test
     void 결제_상세_조회_API_테스트() {
-        // given
+
         Long paymentId = 1L;
 
-        // when
+
         ResponseEntity<PaymentDetailResponse> response =
                 restTemplate.getForEntity(
                         "http://localhost:" + port + "/payments/" + paymentId,
                         PaymentDetailResponse.class
                 );
 
-        // then
+
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         PaymentDetailResponse body = response.getBody();
