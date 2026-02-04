@@ -57,17 +57,15 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
     @Test
     void 주문_상세_조회_API_테스트() {
-        // given
+
         Long orderId = 1L;
 
-        // when
         ResponseEntity<OrderDetailResponse> response =
                 restTemplate.getForEntity(
                         "http://localhost:" + port + "/orders/" + orderId,
                         OrderDetailResponse.class
                 );
 
-        // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         OrderDetailResponse body = response.getBody();

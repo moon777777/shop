@@ -29,7 +29,6 @@ class PaymentControllerTest {
                         PaymentListResponse.class
                 );
 
-        // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         PaymentListResponse body = response.getBody();
