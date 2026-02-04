@@ -1,13 +1,18 @@
 package com.moon.shop.payment;
 
 import com.moon.shop.payment.dto.*;
+import com.moon.shop.payment.service.PaymentService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/payments")
+@RequiredArgsConstructor
 public class PaymentController {
+
+    private final PaymentService paymentService;
 
     @GetMapping
     public PaymentListResponse getMyPayments(
@@ -15,55 +20,21 @@ public class PaymentController {
             @RequestParam(defaultValue = "5") int size
     ) {
 
-        List<PaymentSummary> payments = List.of(
-                new PaymentSummary(
-                        1L,
-                        1L,
-                        40000,
-                        20000,
-                        2000,
-                        0,
-                        22000,
-                        "성공",
-                        "2025-12-25"
-                )
-        );
-
-        return new PaymentListResponse(
-                page,
-                size,
-                payments.size(),
-                payments
-        );
+        return paymentService.getMyPayments(page, size);
     }
 
     @GetMapping("/{paymentId}")
     public PaymentDetailResponse getPaymentDetail(
             @PathVariable Long paymentId
     ) {
-        return new PaymentDetailResponse(
-                paymentId,
-                1L,
-                40000,
-                20000,
-                2000,
-                0,
-                22000,
-                "성공",
-                "2025-12-25"
-        );
+        return paymentService.getPaymentDetail(paymentId);
     }
 
     @PostMapping
     public PaymentCreateResponse createPayment(
             @RequestBody PaymentCreateRequest request
     ) {
-        return new PaymentCreateResponse(
-                1L,
-                request.getOrderId(),
-                request.getPaymentPrice(),
-                "성공"
-        );
+        return paymentService.createPayment(request);
     }
 
 }

@@ -1,6 +1,5 @@
-package com.moon.shop.order.repository;
+package com.moon.shop.payment.repository;
 
-import com.moon.shop.order.domain.Order;
 import com.moon.shop.payment.domain.Payment;
 import org.springframework.stereotype.Repository;
 
@@ -8,13 +7,12 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class OrderRepository {
-    public void save(Order order) {
-
+public class PaymentRepository {
+    public void save(Payment payment) {
     }
 
-    Optional<Order> findById(Long orderId) {
-        return null;
+    public Optional<Payment> findById(Long paymentId) {
+        return Optional.empty();
     }
 
     public List<Payment> findAll() {

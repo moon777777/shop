@@ -43,7 +43,7 @@ class PaymentControllerTest {
         assertThat(payment.getPaymentId()).isEqualTo(1L);
         assertThat(payment.getOrderId()).isEqualTo(1L);
         assertThat(payment.getFinalPaymentPrice()).isEqualTo(22000);
-        assertThat(payment.getPaymentStatus()).isEqualTo("성공");
+        assertThat(payment.getPaymentStatus()).isEqualTo("SUCCESS");
     }
 
     @Test
@@ -67,7 +67,7 @@ class PaymentControllerTest {
         assertThat(body.getPaymentId()).isEqualTo(paymentId);
         assertThat(body.getOrderId()).isEqualTo(1L);
         assertThat(body.getFinalPaymentPrice()).isEqualTo(22000);
-        assertThat(body.getPaymentStatus()).isEqualTo("성공");
+        assertThat(body.getPaymentStatus()).isEqualTo("SUCCESS");
     }
 
     @Test
@@ -84,6 +84,6 @@ class PaymentControllerTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getPaymentStatus()).isEqualTo("성공");
+        assertThat(response.getBody().getPaymentStatus()).isEqualTo("SUCCESS");
     }
 }
