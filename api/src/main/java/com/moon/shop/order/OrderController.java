@@ -29,23 +29,7 @@ public class OrderController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        return new OrderListResponse(
-                page,
-                size,
-                1,
-                List.of(
-                        new OrderSummaryResponse(
-                                1L,
-                                "222-222",
-                                50000,
-                                10000,
-                                40000,
-                                "결제완료",
-                                2,
-                                "2026-01-05"
-                        )
-                )
-        );
+        return orderService.getMyOrders(page, size);
     }
 
     // 상세 조회
@@ -53,34 +37,6 @@ public class OrderController {
     public OrderDetailResponse getOrderDetail(
             @PathVariable Long orderId
     ) {
-        return new OrderDetailResponse(
-                orderId,
-                "000-111",
-                "결제완료",
-                List.of(
-                        new ItemDetailResponse(
-                                1L,
-                                "후드티",
-                                "/images/후드티.png",
-                                20000,
-                                10000,
-                                2,
-                                20000
-                        )
-                ),
-                new OrderAddressResponse(
-                        "가나",
-                        "010-1234-5678",
-                        "12345",
-                        "서울 어딘가",
-                        "101동 1001호"
-                ),
-                40000,
-                20000,
-                2000,
-                22000,
-                "2026-01-02"
-        );
-
+        return orderService.getOrderDetail(orderId);
     }
 }
