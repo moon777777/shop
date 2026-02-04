@@ -1,7 +1,6 @@
 package com.moon.shop.order;
 
 
-import com.moon.shop.order.dto.request.OrderCreateRequest;
 import com.moon.shop.order.dto.response.OrderCreateResponse;
 import com.moon.shop.order.dto.response.OrderDetailResponse;
 import com.moon.shop.order.dto.response.OrderListResponse;
@@ -47,8 +46,13 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
                 );
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody().getOrderId()).isEqualTo(1L);
-        assertThat(response.getBody().getOrderNumber()).isEqualTo("12345");
+
+        OrderCreateResponse responseBody = response.getBody();
+        assertThat(responseBody).isNotNull();
+        assertThat(responseBody.getOrderId()).isNotNull();
+        assertThat(responseBody.getOrderNumber()).startsWith("ORD-");
+        assertThat(responseBody.getOrderStatus()).isEqualTo("배송중");
+        assertThat(responseBody.getCreatedAt()).isNotNull();
     }
 
     @Test

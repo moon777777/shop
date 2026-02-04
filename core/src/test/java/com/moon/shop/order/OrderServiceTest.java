@@ -1,19 +1,18 @@
 package com.moon.shop.order;
 
+import com.moon.shop.CoreTestConfig;
 import com.moon.shop.order.dto.request.OrderCreateRequest;
 import com.moon.shop.order.dto.response.OrderCreateResponse;
 import com.moon.shop.order.repository.OrderRepository;
 import com.moon.shop.order.service.OrderService;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-@SpringBootTest
+@SpringBootTest(classes = CoreTestConfig.class)
 public class OrderServiceTest {
 
     @Autowired

@@ -1,14 +1,10 @@
 package com.moon.shop.payment.service;
 
-import com.moon.shop.payment.domain.Payment;
-import com.moon.shop.payment.domain.PaymentStatus;
 import com.moon.shop.payment.dto.*;
 import com.moon.shop.payment.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service

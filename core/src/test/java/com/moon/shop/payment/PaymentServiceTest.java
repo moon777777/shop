@@ -25,11 +25,9 @@ public class PaymentServiceTest {
 
         PaymentCreateRequest request = new PaymentCreateRequest(1L, 22000, null);
 
-        // when
         PaymentCreateResponse response =
                 paymentService.createPayment(request);
 
-        // then
         assertThat(response).isNotNull();
         assertThat(response.getPaymentId()).isEqualTo(1L);
         assertThat(response.getOrderId()).isEqualTo(1L);
@@ -58,13 +56,11 @@ public class PaymentServiceTest {
 
     @Test
     void 결제_상세를_조회() {
-        // given
+
         Long paymentId = 1L;
 
-        // when
         PaymentDetailResponse response = paymentService.getPaymentDetail(paymentId);
 
-        // then
         assertThat(response).isNotNull();
         assertThat(response.getPaymentId()).isEqualTo(paymentId);
         assertThat(response.getOrderId()).isEqualTo(1L);
