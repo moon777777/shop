@@ -4,33 +4,32 @@ import com.moon.shop.order.domain.Order;
 import com.moon.shop.order.dto.request.OrderCreateRequest;
 import com.moon.shop.order.dto.response.*;
 import com.moon.shop.order.repository.OrderRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class OrderService {
 
     private final OrderRepository orderRepository;
 
-    public OrderService(OrderRepository orderRepository) {
-        this.orderRepository = orderRepository;
-    }
-
     public OrderCreateResponse createOrder(OrderCreateRequest request) {
-        Order order = new Order(
-                1L,
-                "12345",
-                "배송중"
-        );
 
-        orderRepository.save(order);
+        Order order = Order.builder()
+                .status("배송중")
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        Order savedOrder = orderRepository.save(order);
 
         return new OrderCreateResponse(
-                order.getOrderId(),
-                order.getOrderNumber(),
-                order.getStatus(),
-                "2026-01-01"
+                savedOrder.getOrderId(),
+                savedOrder.getOrderNumber(),
+                savedOrder.getStatus(),
+                savedOrder.getCreatedAt().toString()
         );
     }
 

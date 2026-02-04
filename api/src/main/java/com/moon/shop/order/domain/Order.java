@@ -1,12 +1,30 @@
-package com.moon.shop.order.domain;
+    package com.moon.shop.order.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+    import jakarta.persistence.*;
+    import lombok.AllArgsConstructor;
+    import lombok.Builder;
+    import lombok.Getter;
+    import lombok.NoArgsConstructor;
 
-@Getter
-@AllArgsConstructor
-public class Order {
-    private Long orderId;
-    private String orderNumber;
-    private String status;
-}
+    import java.time.LocalDateTime;
+
+    @Entity
+    @Table(name = "orders")
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public class Order {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long orderId;
+        private String orderNumber;
+        private String status;
+        private LocalDateTime createdAt;
+
+        @PostPersist
+        private void assignOrderNumber() {
+            this.orderNumber = "ORD-" + this.orderId;
+        }
+    }

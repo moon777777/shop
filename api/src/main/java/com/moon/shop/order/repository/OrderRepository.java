@@ -1,23 +1,9 @@
 package com.moon.shop.order.repository;
 
 import com.moon.shop.order.domain.Order;
-import com.moon.shop.payment.domain.Payment;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
-
 @Repository
-public class OrderRepository {
-    public void save(Order order) {
-
-    }
-
-    Optional<Order> findById(Long orderId) {
-        return null;
-    }
-
-    public List<Payment> findAll() {
-        return List.of();
-    }
+public interface OrderRepository extends JpaRepository<Order, Long> {
 }
