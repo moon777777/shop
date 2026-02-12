@@ -1,7 +1,11 @@
 plugins {
     id 'com.moon.myPlugin'
-    id 'org.springframework.boot' version '3.5.9'
+
     id 'io.spring.dependency-management' version '1.1.7'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
 }
 
 repositories {
@@ -16,10 +20,12 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.30'
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
 
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    runtimeOnly 'com.h2database:h2'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.5.9'
+    implementation 'org.springframework.boot:spring-boot-starter-web:3.5.9'
+    runtimeOnly 'com.mysql:mysql-connector-j:8.0.33'
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:3.5.9'
+
 }
 
 tasks.named('test') {

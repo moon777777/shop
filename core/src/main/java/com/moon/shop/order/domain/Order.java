@@ -1,12 +1,14 @@
     package com.moon.shop.order.domain;
 
     import jakarta.persistence.*;
-    import lombok.AllArgsConstructor;
-    import lombok.Builder;
-    import lombok.Getter;
-    import lombok.NoArgsConstructor;
+    import lombok.*;
+import lombok.Builder.Default;
+    import jakarta.persistence.Enumerated;
 
     import java.time.LocalDateTime;
+    import java.util.ArrayList;
+    import java.util.List;
+    import com.moon.shop.common.domain.Address;
 
     @Entity
     @Table(name = "orders")
@@ -15,13 +17,27 @@
     @AllArgsConstructor
     @Builder
     public class Order {
-
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long orderId;
         private String orderNumber;
-        private String status;
+        @Enumerated(EnumType.STRING)
+        private OrderStatus status;
         private LocalDateTime createdAt;
+        private String orderType;
+
+        @ManyToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "address_id", nullable = false)
+        private Address address;
+
+        @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+        @Builder.Default
+        private List<OrderItem> orderItems = new ArrayList<>();
+
+
+        public void changeStatus(OrderStatus newStatus) {
+            this.status = newStatus;
+        }
 
         @PostPersist
         private void assignOrderNumber() {
