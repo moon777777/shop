@@ -21,6 +21,6 @@ dependencies {
 }
 
 tasks.named('test') {
-    enabled = false // Temporarily disable tests for this module
+    enabled = true
     useJUnitPlatform()
 }
