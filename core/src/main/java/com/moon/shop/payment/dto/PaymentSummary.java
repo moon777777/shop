@@ -1,12 +1,13 @@
 package com.moon.shop.payment.dto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Getter
-@AllArgsConstructor
+@AllArgsConstructor(onConstructor_ = @JsonCreator)
 public class PaymentSummary {
     private final Long paymentId;
     private final Long orderId;

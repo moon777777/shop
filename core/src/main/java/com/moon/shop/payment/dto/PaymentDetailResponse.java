@@ -1,10 +1,11 @@
 package com.moon.shop.payment.dto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
+@AllArgsConstructor(onConstructor_ = @JsonCreator)
 public class PaymentDetailResponse {
 
     private final Long paymentId;
