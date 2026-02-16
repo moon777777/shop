@@ -1,18 +1,22 @@
-package com.moon.shop.product;
+package com.moon.shop.product; // Changed package to com.moon.shop.product
 
 import com.moon.shop.product.domain.Product;
-import com.moon.shop.product.dto.CreateProductRequest; 
+import com.moon.shop.product.dto.CreateProductRequest;
 import com.moon.shop.product.dto.UpdateProductRequest;
 import com.moon.shop.product.repository.ProductRepository;
-import com.moon.shop.product.service.ProductService;
+import com.moon.shop.product.service.ProductService; // Keep this import for the service
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.ArgumentCaptor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -25,6 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,11 +42,12 @@ class ProductServiceTest {
     private ProductService productService;
 
     private Product product;
-    private CreateProductRequest createRequest; // Added
+    private CreateProductRequest createRequest;
     private UpdateProductRequest updateRequest;
 
     @BeforeEach
     void setUp() {
+        // Sample Product entity
         product = Product.builder()
                 .id(1L)
                 .name("Test Product")
@@ -54,11 +60,11 @@ class ProductServiceTest {
                 .images(Arrays.asList("img1.jpg", "img2.jpg"))
                 .description("Test description")
                 .brand("Test Brand")
-                .specs("{}") // Assuming specs are stored as JSON string
+                .specs("{\"screen\": \"6.1\", \"color\": \"black\"}") // Stored as JSON string - FIXED SYNTAX ERROR
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        createRequest = CreateProductRequest.builder() // Added initialization
+        createRequest = CreateProductRequest.builder()
                 .name("New Product")
                 .originalPrice(15000)
                 .discountPrice(12000)
@@ -72,6 +78,7 @@ class ProductServiceTest {
                 .specs(Map.of("pages", 300, "author", "Test Author"))
                 .build();
 
+        // Sample UpdateProductRequest DTO
         updateRequest = UpdateProductRequest.builder()
                 .name("Updated Product")
                 .originalPrice(12000)
@@ -108,11 +115,7 @@ class ProductServiceTest {
         assertThat(capturedProduct.getImages()).isEqualTo(createRequest.getImages());
         assertThat(capturedProduct.getDescription()).isEqualTo(createRequest.getDescription());
         assertThat(capturedProduct.getBrand()).isEqualTo(createRequest.getBrand());
-        // For specs, we need to assert that it's a JSON string representation of the map
-        // This is a bit more complex to assert directly here without deserializing
-        // but we can check if it's not null/empty for a basic check
-        assertThat(capturedProduct.getSpecs()).isNotNull();
-        // A more thorough check would be to deserialize capturedProduct.getSpecs() back to a Map and compare with createRequest.getSpecs()
+        assertThat(capturedProduct.getSpecs()).isNotNull(); // Basic check for specs
 
         verify(productRepository, times(1)).save(any(Product.class));
     }
@@ -139,17 +142,74 @@ class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("모든 제품 조회 - 성공")
-    void getAllProducts_success() {
+    @DisplayName("모든 제품 조회 - 성공 (페이지네이션 및 필터링 없음)")
+    void getAllProducts_success_noFiltering() {
+        Pageable pageable = PageRequest.of(0, 10);
         List<Product> products = Arrays.asList(product,
                 Product.builder().id(2L).name("Another Product").build());
-        when(productRepository.findAll()).thenReturn(products);
+        Page<Product> productPage = new PageImpl<>(products, pageable, products.size());
 
-        List<Product> foundProducts = productService.getAllProducts();
+        when(productRepository.findAll(any(Pageable.class))).thenReturn(productPage);
+
+        Page<Product> foundProducts = productService.getAllProducts(pageable, Optional.empty(), Optional.empty());
 
         assertThat(foundProducts).hasSize(2);
-        assertThat(foundProducts.get(0).getName()).isEqualTo("Test Product");
-        verify(productRepository, times(1)).findAll();
+        assertThat(foundProducts.getContent().get(0).getName()).isEqualTo("Test Product");
+        verify(productRepository, times(1)).findAll(any(Pageable.class));
+    }
+
+
+    @Test
+    @DisplayName("모든 제품 조회 - 성공 (카테고리 필터링)")
+    void getAllProducts_success_withCategoryFiltering() {
+        Pageable pageable = PageRequest.of(0, 10);
+        List<Product> electronicsProducts = Arrays.asList(product);
+        Page<Product> productPage = new PageImpl<>(electronicsProducts, pageable, electronicsProducts.size());
+
+        when(productRepository.findByCategoryIgnoreCase(eq("Electronics"), any(Pageable.class))).thenReturn(productPage);
+
+        Page<Product> foundProducts = productService.getAllProducts(pageable, Optional.of("Electronics"), Optional.empty());
+
+        assertThat(foundProducts).hasSize(1);
+        assertThat(foundProducts.getContent().get(0).getCategory()).isEqualTo("Electronics");
+        verify(productRepository, times(1)).findByCategoryIgnoreCase(eq("Electronics"), any(Pageable.class));
+    }
+
+    @Test
+    @DisplayName("모든 제품 조회 - 성공 (검색어 필터링)")
+    void getAllProducts_success_withSearchKeywordFiltering() {
+        Pageable pageable = PageRequest.of(0, 10);
+        List<Product> matchingProducts = Arrays.asList(product);
+        Page<Product> productPage = new PageImpl<>(matchingProducts, pageable, matchingProducts.size());
+
+        when(productRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(eq("Test"), eq("Test"), any(Pageable.class)))
+                .thenReturn(productPage);
+
+        Page<Product> foundProducts = productService.getAllProducts(pageable, Optional.empty(), Optional.of("Test"));
+
+        assertThat(foundProducts).hasSize(1);
+        assertThat(foundProducts.getContent().get(0).getName()).contains("Test");
+        verify(productRepository, times(1)).findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(eq("Test"), eq("Test"), any(Pageable.class));
+    }
+
+    @Test
+    @DisplayName("모든 제품 조회 - 성공 (카테고리 및 검색어 필터링)")
+    void getAllProducts_success_withCategoryAndSearchKeywordFiltering() {
+        Pageable pageable = PageRequest.of(0, 10);
+        List<Product> matchingProducts = Arrays.asList(product);
+        Page<Product> productPage = new PageImpl<>(matchingProducts, pageable, matchingProducts.size());
+
+        when(productRepository.findByCategoryIgnoreCaseAndNameContainingIgnoreCaseOrCategoryIgnoreCaseAndDescriptionContainingIgnoreCase(
+                eq("Electronics"), eq("Test"), eq("Electronics"), eq("Test"), any(Pageable.class)))
+                .thenReturn(productPage);
+
+        Page<Product> foundProducts = productService.getAllProducts(pageable, Optional.of("Electronics"), Optional.of("Test"));
+
+        assertThat(foundProducts).hasSize(1);
+        assertThat(foundProducts.getContent().get(0).getCategory()).isEqualTo("Electronics");
+        assertThat(foundProducts.getContent().get(0).getName()).contains("Test");
+        verify(productRepository, times(1)).findByCategoryIgnoreCaseAndNameContainingIgnoreCaseOrCategoryIgnoreCaseAndDescriptionContainingIgnoreCase(
+                eq("Electronics"), eq("Test"), eq("Electronics"), eq("Test"), any(Pageable.class));
     }
 
     @Test
@@ -163,7 +223,6 @@ class ProductServiceTest {
         assertThat(updatedProduct).isNotNull();
         assertThat(updatedProduct.getName()).isEqualTo(updateRequest.getName());
         assertThat(updatedProduct.getOriginalPrice()).isEqualTo(updateRequest.getOriginalPrice());
-        // Verify that the product's update method was called (implicitly by checking state)
         verify(productRepository, times(1)).findById(1L);
         verify(productRepository, times(1)).save(any(Product.class));
     }
