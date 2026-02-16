@@ -1,46 +1,59 @@
 package com.moon.shop.product.domain;
 
-import jakarta.persistence.*;
+import com.moon.shop.product.dto.UpdateProductRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 @Entity
-@Table(name = "products")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long productId;
+    private Long id;
 
-    @Column(nullable = false)
     private String name;
-
-    private String description;
-
-    @Column(nullable = false)
-    private BigDecimal originalPrice;
-    private BigDecimal discountPrice;
-    private Integer discountRate;
-
+    private int originalPrice;
+    private int discountPrice;
+    private int discountRate;
     private String thumbnailImage;
     private String category;
-    
-    @Column(nullable = false)
-    private Integer stock;
+    private int stock;
 
-    private String images;
+    @ElementCollection
+    private List<String> images;
+
+    @Lob
+    private String description;
+
     private String brand;
-    @Column(columnDefinition = "TEXT")
+
+    @Convert(converter = HashMapConverter.class)
     private String specs;
 
     private LocalDateTime createdAt;
+
+    public void update(UpdateProductRequest request) {
+        this.name = request.getName();
+        this.originalPrice = request.getOriginalPrice();
+        this.discountPrice = request.getDiscountPrice();
+        this.discountRate = request.getDiscountRate();
+        this.thumbnailImage = request.getThumbnailImage();
+        this.category = request.getCategory();
+        this.stock = request.getStock();
+        this.images = request.getImages();
+        this.description = request.getDescription();
+        this.brand = request.getBrand();
+        this.specs = new HashMapConverter().convertToDatabaseColumn(request.getSpecs());
+    }
 }
