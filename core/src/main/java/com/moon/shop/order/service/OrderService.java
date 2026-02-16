@@ -11,6 +11,7 @@ import com.moon.shop.order.exception.OrderNotFoundException;
 import com.moon.shop.common.exception.AddressNotFoundException;
 import com.moon.shop.order.repository.OrderRepository;
 import com.moon.shop.common.repository.AddressRepository;
+import com.moon.shop.product.service.ProductService; // Added ProductService import
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +29,7 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final AddressRepository addressRepository;
+    private final ProductService productService; // Added ProductService injection
 
 
     public OrderCreateResponse createOrder(OrderCreateRequest request) {

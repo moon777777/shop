@@ -1,6 +1,7 @@
 package com.moon.shop.product;
 
 import com.moon.shop.product.domain.Product;
+import com.moon.shop.product.dto.CreateProductRequest; 
 import com.moon.shop.product.dto.UpdateProductRequest;
 import com.moon.shop.product.repository.ProductRepository;
 import com.moon.shop.product.service.ProductService;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.ArgumentCaptor;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -35,6 +37,7 @@ class ProductServiceTest {
     private ProductService productService;
 
     private Product product;
+    private CreateProductRequest createRequest; // Added
     private UpdateProductRequest updateRequest;
 
     @BeforeEach
@@ -55,6 +58,20 @@ class ProductServiceTest {
                 .createdAt(LocalDateTime.now())
                 .build();
 
+        createRequest = CreateProductRequest.builder() // Added initialization
+                .name("New Product")
+                .originalPrice(15000)
+                .discountPrice(12000)
+                .discountRate(20)
+                .thumbnailImage("new_thumb.jpg")
+                .category("Books")
+                .stock(50)
+                .images(Arrays.asList("new_img1.jpg"))
+                .description("New product description")
+                .brand("New Brand")
+                .specs(Map.of("pages", 300, "author", "Test Author"))
+                .build();
+
         updateRequest = UpdateProductRequest.builder()
                 .name("Updated Product")
                 .originalPrice(12000)
@@ -66,19 +83,37 @@ class ProductServiceTest {
                 .images(Arrays.asList("updated_img1.jpg", "updated_img2.jpg"))
                 .description("Updated description")
                 .brand("Updated Brand")
-                .specs(Map.of("weight", "1kg", "color", "blue")) // Assuming map input for specs
+                .specs(Map.of("weight", "1kg", "color", "blue"))
                 .build();
     }
 
     @Test
     @DisplayName("제품 생성 - 성공")
     void createProduct_success() {
-        when(productRepository.save(any(Product.class))).thenReturn(product);
+        ArgumentCaptor<Product> productCaptor = ArgumentCaptor.forClass(Product.class);
+        when(productRepository.save(productCaptor.capture())).thenReturn(product); // Capture the argument
 
-        Product createdProduct = productService.createProduct(product);
+        Product createdProduct = productService.createProduct(createRequest);
 
         assertThat(createdProduct).isNotNull();
-        assertThat(createdProduct.getName()).isEqualTo("Test Product");
+        // Assert against the captured product's properties, which should match createRequest
+        Product capturedProduct = productCaptor.getValue();
+        assertThat(capturedProduct.getName()).isEqualTo(createRequest.getName());
+        assertThat(capturedProduct.getOriginalPrice()).isEqualTo(createRequest.getOriginalPrice());
+        assertThat(capturedProduct.getDiscountPrice()).isEqualTo(createRequest.getDiscountPrice());
+        assertThat(capturedProduct.getDiscountRate()).isEqualTo(createRequest.getDiscountRate());
+        assertThat(capturedProduct.getThumbnailImage()).isEqualTo(createRequest.getThumbnailImage());
+        assertThat(capturedProduct.getCategory()).isEqualTo(createRequest.getCategory());
+        assertThat(capturedProduct.getStock()).isEqualTo(createRequest.getStock());
+        assertThat(capturedProduct.getImages()).isEqualTo(createRequest.getImages());
+        assertThat(capturedProduct.getDescription()).isEqualTo(createRequest.getDescription());
+        assertThat(capturedProduct.getBrand()).isEqualTo(createRequest.getBrand());
+        // For specs, we need to assert that it's a JSON string representation of the map
+        // This is a bit more complex to assert directly here without deserializing
+        // but we can check if it's not null/empty for a basic check
+        assertThat(capturedProduct.getSpecs()).isNotNull();
+        // A more thorough check would be to deserialize capturedProduct.getSpecs() back to a Map and compare with createRequest.getSpecs()
+
         verify(productRepository, times(1)).save(any(Product.class));
     }
 
