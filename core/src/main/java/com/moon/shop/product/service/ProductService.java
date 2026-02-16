@@ -10,8 +10,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime; // Added for createdAt
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional; // Added
 
 @Service
 @RequiredArgsConstructor
@@ -44,8 +47,18 @@ public class ProductService {
                 .orElseThrow(() -> new NoSuchElementException("Product not found with id: " + id));
     }
 
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    public Page<Product> getAllProducts(Pageable pageable, Optional<String> category, Optional<String> searchKeyword) {
+        if (category.isPresent() && searchKeyword.isPresent()) {
+            return productRepository.findByCategoryIgnoreCaseAndNameContainingIgnoreCaseOrCategoryIgnoreCaseAndDescriptionContainingIgnoreCase(
+                    category.get(), searchKeyword.get(), category.get(), searchKeyword.get(), pageable);
+        } else if (category.isPresent()) {
+            return productRepository.findByCategoryIgnoreCase(category.get(), pageable);
+        } else if (searchKeyword.isPresent()) {
+            return productRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
+                    searchKeyword.get(), searchKeyword.get(), pageable);
+        } else {
+            return productRepository.findAll(pageable);
+        }
     }
 
     @Transactional
