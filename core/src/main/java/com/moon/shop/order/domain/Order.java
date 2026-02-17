@@ -3,7 +3,6 @@
     import jakarta.persistence.*;
     import lombok.*;
 import lombok.Builder.Default;
-    import jakarta.persistence.Enumerated;
 
     import java.time.LocalDateTime;
     import java.util.ArrayList;
@@ -25,6 +24,7 @@ import lombok.Builder.Default;
         private OrderStatus status;
         private LocalDateTime createdAt;
         private String orderType;
+        private LocalDateTime paidAt;
 
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "address_id", nullable = false)
@@ -39,7 +39,12 @@ import lombok.Builder.Default;
             this.status = newStatus;
         }
 
-        @PostPersist
+        public void addOrderItem(OrderItem orderItem) {
+            orderItems.add(orderItem);
+            orderItem.setOrder(this);
+        }
+
+        @PrePersist
         private void assignOrderNumber() {
             this.orderNumber = "ORD-" + this.orderId;
         }

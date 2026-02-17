@@ -78,4 +78,17 @@ public class ProductService {
         }
         productRepository.deleteById(id);
     }
+
+    @Transactional
+    public void decreaseStock(Long productId, int quantity) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new NoSuchElementException("Product not found with id: " + productId));
+        
+        if (product.getStock() < quantity) {
+            throw new IllegalStateException("Not enough stock for product: " + product.getName());
+        }
+        
+        product.toBuilder().stock(product.getStock() - quantity).build();
+        productRepository.save(product);
+    }
 }

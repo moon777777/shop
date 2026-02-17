@@ -34,4 +34,8 @@ public class OrderItem {
 
     @Column(nullable = false)
     private BigDecimal priceAtOrder;
+
+    public void setOrder(Order order) {
+        this.order = order;
+    }
 }

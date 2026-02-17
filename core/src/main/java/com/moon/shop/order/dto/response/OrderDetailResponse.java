@@ -13,12 +13,14 @@ public class OrderDetailResponse {
     private final Long orderId;
     private final String orderNumber;
     private final String orderStatus;
-    private final List<ItemDetailResponse> itemDetails;
-    private final OrderAddressResponse address;
+    private final List<OrderItemDetail> orderItems;
+    private final OrderAddressResponse deliveryAddress;
     private final int totalProductPrice;
     private final int totalDiscountPrice;
     private final int deliveryFee;
     private final int finalPaymentPrice;
     private final String createdAt;
+    private final String paidAt;
+
 
 }
