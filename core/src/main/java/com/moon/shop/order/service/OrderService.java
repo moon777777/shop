@@ -42,15 +42,6 @@ public class OrderService {
         Address address = addressRepository.findById(request.getAddressId())
                 .orElseThrow(() -> new AddressNotFoundException("Address with ID " + request.getAddressId() + " not found."));
 
-        Order order = Order.builder()
-                .status(OrderStatus.PENDING)
-                .orderType(OrderType.DIRECT.name())
-                .address(address)
-                .createdAt(LocalDateTime.now())
-                .build();
-
-        orderRepository.save(order);
-
         List<String> outOfStockProducts = new ArrayList<>();
         List<OrderItem> orderItems = new ArrayList<>();
 
@@ -69,22 +60,33 @@ public class OrderService {
                         .priceAtOrder(BigDecimal.valueOf(product.getDiscountPrice()))
                         .build();
                 orderItems.add(orderItem);
-                order.addOrderItem(orderItem);
-                productService.decreaseStock(product.getId(), orderItemRequest.getQuantity());
             }
         }
 
         if (!outOfStockProducts.isEmpty()) {
             throw new OutOfStockException("Following products are out of stock: " + String.join(", ", outOfStockProducts), outOfStockProducts);
         }
+        
+        Order order = Order.builder()
+                .status(OrderStatus.PENDING)
+                .orderType(OrderType.DIRECT.name())
+                .address(address)
+                .createdAt(LocalDateTime.now())
+                .build();
+        
+        for (OrderItem item : orderItems) {
+            order.addOrderItem(item);
+            productService.decreaseStock(item.getProduct().getId(), item.getQuantity());
+        }
 
+        Order savedOrder = orderRepository.save(order);
         orderItemRepository.saveAll(orderItems);
 
         return new OrderCreateResponse(
-                order.getOrderId(),
-                order.getOrderNumber(),
-                order.getStatus().name(),
-                order.getCreatedAt().toString()
+                savedOrder.getOrderId(),
+                savedOrder.getOrderNumber(),
+                savedOrder.getStatus().name(),
+                savedOrder.getCreatedAt().toString()
         );
     }
 
