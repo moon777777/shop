@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class ItemDetailResponse {
+public class OrderItemDetail {
 
     private final Long productId;
     private final String productName;

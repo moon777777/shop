@@ -1,68 +1,51 @@
 package com.moon.shop.payment.service;
 
-import com.moon.shop.payment.dto.*;
+import com.moon.shop.payment.domain.Payment;
+import com.moon.shop.payment.dto.PaymentListResponse;
+import com.moon.shop.payment.dto.PaymentSummary;
 import com.moon.shop.payment.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
 
-    // 결제 생성
-    public PaymentCreateResponse createPayment(PaymentCreateRequest request) {
+    public PaymentListResponse getPaymentHistoryForUser(Long userId, Pageable pageable) {
+        Page<Payment> paymentPage = paymentRepository.findByOrder_User_Id(userId, pageable);
 
-        return new PaymentCreateResponse(
-                1L,
-                request.getOrderId(),
-                request.getPaymentPrice(),
-                "SUCCESS"
-        );
-    }
-
-    // 결제 목록 조회
-    public PaymentListResponse getMyPayments(int page, int size) {
-
-        List<PaymentSummary> payments = List.of(
-                new PaymentSummary(
-                        1L,
-                        1L,
-                        40000,
-                        20000,
-                        2000,
-                        0,
-                        22000,
-                        "SUCCESS",
-                        "2026-01-02"
-                )
-        );
+        List<PaymentSummary> paymentSummaries = paymentPage.getContent().stream()
+                .map(this::mapToPaymentSummary)
+                .collect(Collectors.toList());
 
         return new PaymentListResponse(
-                page,
-                size,
-                1,
-                payments
+                paymentPage.getNumber(),
+                paymentPage.getSize(),
+                paymentPage.getTotalElements(),
+                paymentSummaries
         );
     }
 
-    // 결제 상세 조회
-    public PaymentDetailResponse getPaymentDetail(Long paymentId) {
-
-        return new PaymentDetailResponse(
-                paymentId,
-                1L,
-                40000,
-                20000,
-                2000,
-                0,
-                22000,
-                "SUCCESS",
-                "2026-01-02"
+    private PaymentSummary mapToPaymentSummary(Payment payment) {
+        return new PaymentSummary(
+                payment.getPaymentId(),
+                payment.getOrder().getOrderId(),
+                payment.getTotalProductPrice(),
+                payment.getTotalDiscountPrice(),
+                payment.getDeliveryFee(),
+                payment.getUsedPoint(),
+                payment.getFinalPaymentPrice(),
+                payment.getPaymentStatus(),
+                payment.getPaidAt()
         );
     }
-
 }

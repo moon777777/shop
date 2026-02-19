@@ -1,21 +1,17 @@
 package com.moon.shop.payment.repository;
 
 import com.moon.shop.payment.domain.Payment;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class PaymentRepository {
-    public void save(Payment payment) {
-    }
+public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
-    public Optional<Payment> findById(Long paymentId) {
-        return Optional.empty();
-    }
+    Optional<Payment> findByOrderId(Long orderId);
 
-    public List<Payment> findAll() {
-        return List.of();
-    }
+    Page<Payment> findByOrder_User_Id(Long userId, Pageable pageable);
 }

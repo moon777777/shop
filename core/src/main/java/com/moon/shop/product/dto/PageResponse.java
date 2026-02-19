@@ -1,12 +1,13 @@
 package com.moon.shop.product.dto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.List;
 
 @Getter
-@AllArgsConstructor
+@AllArgsConstructor(onConstructor_ = @JsonCreator)
 public class PageResponse {
 
     private final int page;

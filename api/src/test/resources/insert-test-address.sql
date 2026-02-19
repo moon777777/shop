@@ -1,0 +1,1 @@
+INSERT INTO addresses (address_id, recipient_name, phone_number, zip_code, address1, address2) VALUES (1, 'Test Recipient', '010-1234-5678', '12345', 'Test Address 1', 'Test Address 2');
